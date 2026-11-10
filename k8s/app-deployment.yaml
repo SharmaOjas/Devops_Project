@@ -1,0 +1,94 @@
+# Non-secret settings shared by every app container (read by db.py as DSW_* env vars).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dsw-config
+data:
+  DSW_DB_HOST: postgis
+  DSW_DB_PORT: "5432"
+---
+# One-off Job: create schema/triggers/roles from database.sql and load the land map.
+# Safe to re-run (database.sql is idempotent). Retries until PostGIS is ready.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dsw-db-init
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: db-init
+          image: dark-ship-watch:1.0
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c", "python setup_db.py; python setup_db.py --land"]
+          envFrom:
+            - configMapRef: { name: dsw-config }
+            - secretRef: { name: dsw-db-secret }
+---
+# Web UI + API + drift-polygon (possible-area) model, 2 replicas behind the NodePort service.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dark-ship-app
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0          # never drop below 2 ready pods during an update -> zero downtime
+      maxSurge: 1
+  selector:
+    matchLabels: { app: dark-ship-app }
+  template:
+    metadata:
+      labels: { app: dark-ship-app }
+    spec:
+      containers:
+        - name: web
+          image: dark-ship-watch:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef: { name: dsw-config }
+            - secretRef: { name: dsw-db-secret }
+          readinessProbe:          # only receive traffic once the DB answers
+            httpGet: { path: /api/health, port: 5000 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:           # restart only if the web process itself hangs (no DB dependency)
+            httpGet: { path: /, port: 5000 }
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 1Gi }
+---
+# Collector: polls live AIS / weather feeds and runs the possible-area engine. Exactly one writer.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dark-ship-collector
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate               # avoid two collectors writing at once during an update
+  selector:
+    matchLabels: { app: dark-ship-collector }
+  template:
+    metadata:
+      labels: { app: dark-ship-collector }
+    spec:
+      containers:
+        - name: collector
+          image: dark-ship-watch:1.0
+          imagePullPolicy: IfNotPresent
+          command: ["python", "collector.py"]
+          envFrom:
+            - configMapRef: { name: dsw-config }
+            - secretRef: { name: dsw-db-secret }
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 1Gi }

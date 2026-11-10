@@ -1,0 +1,26 @@
+# Internal only: app, collector and init job reach PostGIS at postgis:5432.
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgis
+spec:
+  type: ClusterIP
+  selector: { app: postgis }
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+# Public: the map UI at http://localhost:30000, load-balanced across the 2 app pods.
+# LoadBalancer (not plain NodePort) because Docker Desktop's kind-based cluster only publishes
+# LoadBalancer ports to localhost. It still allocates NodePort 30000 underneath.
+apiVersion: v1
+kind: Service
+metadata:
+  name: dark-ship-app
+spec:
+  type: LoadBalancer
+  selector: { app: dark-ship-app }
+  ports:
+    - port: 30000
+      targetPort: 5000
+      nodePort: 30000

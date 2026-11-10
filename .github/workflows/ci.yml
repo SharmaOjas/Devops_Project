@@ -1,0 +1,69 @@
+# CI/CD: on every push, build the image, deploy the whole stack to a throwaway
+# Kubernetes cluster (kind), smoke-test it, and prove a zero-downtime rolling update.
+name: CI - build and deploy to Kubernetes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Python code compiles
+        run: python -m py_compile *.py
+
+      - name: Build Docker image
+        run: docker build -t dark-ship-watch:1.0 .
+
+      - name: Create Kubernetes cluster (kind)
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: dsw
+
+      - name: Load image into the cluster
+        run: kind load docker-image dark-ship-watch:1.0 --name dsw
+
+      - name: Deploy manifests
+        run: |
+          kubectl apply -f k8s/
+          kubectl rollout status statefulset/postgis --timeout=180s
+          kubectl wait --for=condition=complete job/dsw-db-init --timeout=300s
+          kubectl rollout status deployment/dark-ship-app --timeout=180s
+          kubectl get pods,svc,pvc
+
+      - name: Smoke test the API
+        run: |
+          kubectl port-forward svc/dark-ship-app 8080:30000 &
+          for i in $(seq 1 20); do curl -fsS localhost:8080/api/health && break; sleep 3; done
+          curl -fsS localhost:8080/api/health
+          curl -fsS -o /dev/null localhost:8080/
+
+      - name: Rolling update keeps 2 ready pods
+        run: |
+          kubectl rollout restart deployment/dark-ship-app
+          kubectl rollout status deployment/dark-ship-app --timeout=180s
+          test "$(kubectl get deploy dark-ship-app -o jsonpath='{.status.readyReplicas}')" = 2
+
+      - name: Data survives a database pod restart
+        run: |
+          q='SELECT count(*) FROM pipeline_config;'
+          before=$(kubectl exec postgis-0 -- psql -U postgres -d darkshipwatch -tAc "$q")
+          kubectl delete pod postgis-0
+          kubectl wait --for=condition=ready pod/postgis-0 --timeout=180s
+          after=$(kubectl exec postgis-0 -- psql -U postgres -d darkshipwatch -tAc "$q")
+          echo "rows before=$before after=$after"
+          test "$before" = "$after" && test "$before" -gt 0
+
+      - name: Show cluster state on failure
+        if: failure()
+        run: |
+          kubectl get all
+          kubectl describe pods | tail -100
+          kubectl logs job/dsw-db-init --tail=50 || true
+          kubectl logs deployment/dark-ship-app --tail=50 || true

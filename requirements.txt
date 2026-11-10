@@ -1,0 +1,6 @@
+# Python 3.10+
+psycopg2-binary>=2.9
+requests>=2.31
+shapely>=2.0
+pyshp>=2.3        # reads the Natural Earth shapefile in load_land.py
+flask>=3.0        # web UI

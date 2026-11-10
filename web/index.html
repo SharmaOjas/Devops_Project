@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dark Ship Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&family=Montserrat:wght@300;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="/static/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230c2238' stroke='%23e3b448' stroke-width='2'/%3E%3Cpath d='M16 4l3 12-3 12-3-12z' fill='%23e3b448'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- ======================================================================= OPENING PAGE -->
+<div id="intro">
+  <nav class="in-nav" id="inNav">
+    <a class="in-logo" href="#" data-go="top">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="none" stroke="#e6d3a8" stroke-width="2"/><path d="M32 6 L37 29 L32 32 L27 29 Z" fill="#e6d3a8"/><path d="M32 58 L27 35 L32 32 L37 35 Z" fill="#9fc9d3"/><path d="M6 32 L29 27 L32 32 L29 37 Z" fill="#9fc9d3" fill-opacity=".7"/><path d="M58 32 L35 37 L32 32 L35 27 Z" fill="#9fc9d3" fill-opacity=".7"/></svg>
+      <span>Dark Ship Watch</span>
+    </a>
+    <div class="in-links">
+      <a href="#" data-go="how">How it works</a><a href="#" data-go="numbers">Numbers</a><a href="#" data-go="tracks">Tracks</a><a href="#" data-go="gulf">The Gulf</a><a href="#" data-go="tracker">Live tracker</a>
+    </div>
+    <button class="pill solid small" data-enter="map">Enter the watch</button>
+  </nav>
+
+  <!-- 1 · HERO -->
+  <section class="in-hero" data-sec="top">
+    <img id="heroPhoto" src="/static/img/hero.jpg" alt="" onerror="this.remove()">
+    <canvas id="oceanCanvas"></canvas>
+    <div class="hero-shade"></div>
+    <div class="hero-copy">
+      <div class="hero-frame">
+        <p class="eyebrow">Beauty of the Baltic &nbsp;·&nbsp; Live from the Gulf of Finland</p>
+        <h1><span>Dark Ship</span><em>Watch</em></h1>
+        <p class="lede">Every vessel on the water, tracked live from open government data &mdash; and the ones that go silent, accounted for.</p>
+        <div class="hero-cta">
+          <button class="pill solid" id="enterBtn" data-enter="map">Enter the watch <b>&rarr;</b></button>
+          <button class="pill ghost" data-go="how"><i class="play"></i> How it works</button>
+        </div>
+      </div>
+    </div>
+    <div class="hero-callout" id="callout"><b>MMSI 230 689 000</b><span>HEADING 270° &nbsp;·&nbsp; 12.4 KN</span><em>AIS · pinged 0:42 ago</em></div>
+    <div class="hero-live" id="heroLive"></div>
+    <div class="scroll-hint" data-go="how"><i></i><span>Scroll</span></div>
+    <div class="hero-word"><span>Baltic</span></div>
+  </section>
+
+  <!-- 2 · HOW IT WORKS -->
+  <section class="in-sec dark" data-sec="how">
+    <div class="in-head reveal"><p class="eyebrow">How it works</p><h2>From a radio ping to a <em>reasoned answer</em></h2>
+      <p>Four steps run in the background, every minute, whether anyone is watching or not.</p></div>
+    <div class="timeline reveal">
+      <span class="tl-arrow l">&lsaquo;</span><div class="tl-line"></div><span class="tl-arrow r">&rsaquo;</span>
+      <div class="tl-dots"><i></i><i></i><i></i><i></i></div>
+      <div class="tl-labels"><span>Every 60 seconds</span><span>All or nothing</span><span>Neighbours checked</span><span>Both dots shown</span></div>
+    </div>
+    <div class="steps">
+      <article class="step reveal"><div class="art a1"><svg viewBox="0 0 300 150"><g fill="none" stroke="#7fd8ee" stroke-opacity=".55"><circle cx="150" cy="75" r="22"/><circle cx="150" cy="75" r="44"/><circle cx="150" cy="75" r="66"/></g><path d="M150 75 L236 28" stroke="#e6d3a8" stroke-width="2"/><circle cx="150" cy="75" r="4" fill="#e6d3a8"/><g fill="#46c6cf"><circle cx="86" cy="52" r="3.5"/><circle cx="212" cy="104" r="3.5"/><circle cx="118" cy="112" r="3.5"/><circle cx="196" cy="46" r="3.5"/></g></svg></div>
+        <h3>1 · Collect</h3><p>A background program asks the open data sources for ship positions, ship details, sea state, wind and waves every minute. If one fails, it tries again.</p></article>
+      <article class="step reveal"><div class="art a2"><svg viewBox="0 0 300 150"><g fill="none" stroke="#7fd8ee" stroke-opacity=".6"><rect x="30" y="52" width="70" height="46" rx="8"/><rect x="200" y="30" width="70" height="40" rx="8"/><rect x="200" y="86" width="70" height="40" rx="8" stroke="#ff6b6b"/></g><g stroke="#e6d3a8" stroke-dasharray="4 5" fill="none"><path d="M100 75 H150 V50 H200"/><path d="M150 75 V106 H200"/></g><text x="42" y="80" fill="#cfeaf0" font-size="12" font-family="Inter">staging</text><text x="209" y="54" fill="#cfeaf0" font-size="12" font-family="Inter">trusted</text><text x="209" y="110" fill="#ffb3ba" font-size="12" font-family="Inter">rejected</text></svg></div>
+        <h3>2 · Validate</h3><p>New records wait in a holding area. The database then checks each one and keeps it or refuses it (repeats, impossible positions, impossible jumps) and writes down why.</p></article>
+      <article class="step reveal"><div class="art a3"><svg viewBox="0 0 300 150"><g fill="#46c6cf"><circle cx="80" cy="60" r="4"/><circle cx="110" cy="92" r="4"/><circle cx="150" cy="50" r="4"/><circle cx="190" cy="98" r="4"/><circle cx="224" cy="62" r="4"/></g><circle cx="150" cy="75" r="10" fill="#ff4d5e"/><circle cx="150" cy="75" r="26" fill="none" stroke="#ff4d5e" stroke-opacity=".6"/><circle cx="150" cy="75" r="46" fill="none" stroke="#ff4d5e" stroke-opacity=".3"/><circle cx="150" cy="75" r="68" fill="none" stroke="#e6d3a8" stroke-dasharray="3 6"/></svg></div>
+        <h3>3 · Detect</h3><p>Ships that stay quiet for 20 minutes are checked. Are they in port? Parked? Leaving our area? Did the ships around them go quiet too? Only the unexplained ones remain.</p></article>
+      <article class="step reveal"><div class="art a4"><svg viewBox="0 0 300 150"><path d="M40 118 C 90 20, 210 20, 260 118 Z" fill="#46c6cf" fill-opacity=".25" stroke="#46c6cf"/><ellipse cx="150" cy="96" rx="76" ry="30" fill="#7fd8ee" fill-opacity=".25" stroke="#7fd8ee" stroke-dasharray="4 4"/><circle cx="74" cy="104" r="7" fill="#07304a" stroke="#fff" stroke-width="3"/><circle cx="226" cy="90" r="7" fill="#07304a" stroke="#e6d3a8" stroke-width="3"/></svg></div>
+        <h3>4 · Reveal</h3><p>Both positions, plus the sea area the ship could have crossed, with land removed and the speed adjusted for wind and waves. It shows what was possible, not what happened.</p></article>
+    </div>
+  </section>
+
+  <!-- 3 · NUMBERS -->
+  <section class="in-sec numbers" data-sec="numbers">
+    <svg class="jelly" viewBox="0 0 400 560" aria-hidden="true"><defs><radialGradient id="jb" cx="50%" cy="30%" r="70%"><stop offset="0" stop-color="#cdeef7" stop-opacity=".55"/><stop offset=".6" stop-color="#6fc3d8" stop-opacity=".25"/><stop offset="1" stop-color="#2a7a9a" stop-opacity=".05"/></radialGradient><filter id="jf"><feGaussianBlur stdDeviation="3"/></filter></defs>
+      <g filter="url(#jf)"><path d="M60 200 C60 60 340 60 340 200 C340 225 300 232 280 218 C262 236 238 236 220 220 C204 238 180 238 164 220 C146 236 118 236 100 218 C80 232 60 225 60 200Z" fill="url(#jb)"/>
+      <g fill="none" stroke="#bfe9f4" stroke-opacity=".35" stroke-width="3" class="tent"><path d="M110 226 C 90 300, 140 340, 110 420 S 130 500, 110 540"/><path d="M160 232 C 140 320, 190 360, 160 450 S 180 520, 160 556"/><path d="M215 232 C 235 320, 185 380, 215 460 S 200 520, 220 556"/><path d="M270 226 C 290 300, 240 350, 270 430 S 250 500, 275 540"/></g></g></svg>
+    <div class="in-head center reveal"><p class="eyebrow">Right now</p><h2>The Gulf of Finland, <em>by the numbers</em></h2></div>
+    <div class="bignums" id="bigNums"></div>
+    <p class="numbers-note reveal">Live counts from the database &mdash; they change every minute.</p>
+  </section>
+
+  <!-- 4 · THREE TRACKS -->
+  <section class="in-sec dark tight" data-sec="tracks">
+    <div class="in-head center reveal"><p class="eyebrow">What it does</p><h2>Three ways to <em>use</em> the data</h2></div>
+    <div class="tiles">
+      <article class="tile reveal" data-enter="map">
+        <svg class="tile-art" viewBox="0 0 400 520" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="tg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a4a63"/><stop offset="1" stop-color="#03182a"/></linearGradient></defs><rect width="400" height="520" fill="url(#tg1)"/>
+          <g fill="none" stroke-linecap="round"><path d="M-20 420 C80 380 120 300 200 290 S330 210 430 120" stroke="#7fd8ee" stroke-opacity=".7" stroke-width="2.5" stroke-dasharray="1 9"/><path d="M-20 340 C70 330 150 250 230 240 S350 170 430 60" stroke="#46c6cf" stroke-opacity=".55" stroke-width="2.5" stroke-dasharray="1 9"/><path d="M-20 480 C100 440 170 400 250 330 S360 290 430 230" stroke="#e6d3a8" stroke-opacity=".5" stroke-width="2.5" stroke-dasharray="1 9"/></g>
+          <g fill="#eaf6f8"><circle cx="200" cy="290" r="6"/><circle cx="230" cy="240" r="6"/><circle cx="250" cy="330" r="6"/></g></svg>
+        <div class="tile-shade"></div><div class="tile-copy"><small>Main idea</small><h3>Mobile</h3><p>Where each ship is now, where it has been, and bad records refused.</p><span class="pill ghost small">Open the map</span></div></article>
+      <article class="tile reveal" data-enter="temporal">
+        <svg class="tile-art" viewBox="0 0 400 520" preserveAspectRatio="xMidYMid slice"><rect width="400" height="520" fill="url(#tg1)"/>
+          <g><rect x="40" y="150" width="160" height="26" rx="13" fill="#2c6f8c"/><rect x="180" y="200" width="170" height="26" rx="13" fill="#46c6cf"/><rect x="90" y="250" width="120" height="26" rx="13" fill="#2c6f8c" opacity=".7"/><rect x="230" y="300" width="130" height="26" rx="13" fill="#e6d3a8" opacity=".85"/></g>
+          <g stroke="#7fd8ee" stroke-opacity=".25"><path d="M40 120 V380"/><path d="M120 120 V380"/><path d="M200 120 V380"/><path d="M280 120 V380"/><path d="M360 120 V380"/></g></svg>
+        <div class="tile-shade"></div><div class="tile-copy"><small>Extra</small><h3>Temporal</h3><p>Each ship’s destination history: what was true, and when we learned it. Nothing is overwritten.</p><span class="pill ghost small">See the history</span></div></article>
+      <article class="tile reveal" data-enter="ports">
+        <svg class="tile-art" viewBox="0 0 400 520" preserveAspectRatio="xMidYMid slice"><rect width="400" height="520" fill="url(#tg1)"/>
+          <g fill="#7fd8ee" fill-opacity=".45" id="gisdots"></g>
+          <path d="M0 330 C60 300 120 330 170 300 S280 250 400 290 V520 H0Z" fill="#d8dfb8" fill-opacity=".16"/>
+          <circle cx="250" cy="270" r="64" fill="none" stroke="#e6d3a8" stroke-dasharray="4 6"/><circle cx="250" cy="270" r="6" fill="#e6d3a8"/><circle cx="130" cy="210" r="46" fill="none" stroke="#46c6cf" stroke-opacity=".8"/><circle cx="130" cy="210" r="5" fill="#46c6cf"/></svg>
+        <div class="tile-shade"></div><div class="tile-copy"><small>Extra</small><h3>GIS</h3><p>Port zones, the nearest port, and sea areas with land removed.</p><span class="pill ghost small">Explore ports</span></div></article>
+    </div>
+  </section>
+
+  <!-- 5 · DISCOVER THE GULF (illustrated map on paper) -->
+  <section class="in-sec paper" data-sec="gulf">
+    <div class="gulf">
+      <div class="gulf-text reveal"><i class="dash"></i><h2>Discover the Gulf</h2>
+        <p>One of the busiest stretches of water in the world: ferries between Helsinki and Tallinn, tankers to Primorsk, cargo to Kotka. Every dot you will see is a real ship.</p>
+        <p class="small">The dotted sea, port rings and counts are drawn live from the database.</p>
+        <button class="pill solid dark" data-enter="map">Open the live map <b>&rarr;</b></button></div>
+      <div class="gulf-map reveal"><canvas id="gulfCanvas"></canvas></div>
+    </div>
+  </section>
+
+  <!-- 6 · LIVE TRACKER MOCKUP -->
+  <section class="in-sec dark" data-sec="tracker">
+    <div class="in-head center reveal"><p class="eyebrow">Live tracker</p><h2>Watch the Baltic <em>move</em></h2></div>
+    <div class="device reveal" data-enter="map">
+      <div class="device-bar"><i></i><i></i><i></i><span>darkshipwatch · live map</span></div>
+      <div class="device-screen"><canvas id="deviceCanvas"></canvas>
+        <aside class="pings"><small>Recent pings</small><div id="pingList"></div><em>Digitraffic · FMI</em></aside>
+        <div class="popcard" id="popCard"></div></div>
+    </div>
+  </section>
+
+  <!-- 7 · CTA -->
+  <section class="in-cta" data-sec="cta">
+    <svg class="cta-wave" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0 0 H1440 V60 C1200 0 960 120 720 60 S240 0 0 60 Z" fill="currentColor"/></svg>
+    <div class="cta-inner reveal"><p class="eyebrow">Get the full picture</p><h2>Let&rsquo;s watch the Baltic <em>together</em></h2>
+      <p>Interactive map, ships going dark, destination history, how the data flows, and database health &mdash; all on live data.</p>
+      <button class="pill solid sand" data-enter="map">Enter the watch <b>&rarr;</b></button></div>
+    <footer><span>© 2026 Dark Ship Watch · ADBMS case study</span><span>PostgreSQL · PostGIS · Digitraffic · FMI · Natural Earth</span></footer>
+  </section>
+</div>
+
+<div id="app">
+
+  <header class="top">
+    <div class="brand" id="brandHome" title="Back to the opening page">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="29" fill="#0c2238" stroke="#e3b448" stroke-width="2.4"/>
+        <circle cx="32" cy="32" r="22" fill="none" stroke="#2dd4bf" stroke-opacity=".5" stroke-width="1" stroke-dasharray="2 3"/>
+        <path d="M32 6 L37 29 L32 32 L27 29 Z" fill="#e3b448"/>
+        <path d="M32 58 L27 35 L32 32 L37 35 Z" fill="#8aa9bf"/>
+        <path d="M6 32 L29 27 L32 32 L29 37 Z" fill="#8aa9bf" fill-opacity=".7"/>
+        <path d="M58 32 L35 37 L32 32 L35 27 Z" fill="#8aa9bf" fill-opacity=".7"/>
+        <circle cx="32" cy="32" r="3.2" fill="#07121f" stroke="#e3b448" stroke-width="1.6"/>
+      </svg>
+      <div><h1>Dark Ship Watch</h1><small>Baltic AIS &middot; Going-Dark Detection &middot; PostgreSQL + PostGIS</small></div>
+    </div>
+
+    <nav class="tabs" id="tabs"></nav>
+
+    <div class="top-right">
+      <div class="live-pill" title="Auto-refresh every 30 s"><span class="dot" id="liveDot"></span><span id="liveText">connecting&hellip;</span></div>
+      <div class="clock" id="clock"></div>
+      <button class="btn small" id="guideBtn" type="button">Help</button>
+      <div class="menu" id="demoMenu">
+        <button class="btn brass" id="demoBtn">Demo controls &#9662;</button>
+        <div class="menu-panel">
+          <button data-act="seed_demo"><b>Load demo ships</b><span>Adds made-up ships (marked DEMO) so you can see every situation: a ship entering port, bad records, a ship going dark, and a receiver outage.</span></button>
+          <button data-act="collect"><b>Get the latest live data now</b><span>Fetches new ship positions and wind straight away.</span></button>
+          <button data-act="detect"><b>Check for silent ships now</b><span>Looks for ships that stopped sending, and works out where they could have been.</span></button>
+          <button data-act="traffic_grid"><b>Rebuild the busy-lanes map</b><span>Shows where ships have sailed.</span></button>
+          <hr>
+          <button data-act="reset_demo"><b>Remove the demo ships</b><span>Deletes only the made-up ships. Real data stays.</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <main>
+    <!-- ================= LIVE MAP ================= -->
+    <section class="tab map-tab" id="tab-map">
+      <div id="map"></div>
+
+      <aside class="side" id="side">
+        <div class="side-head"><div><h3 id="sideTitle">Fleet overview</h3><div class="meta" id="sideMeta"></div></div><button class="x" id="sideClose" title="Hide panel">&times;</button></div>
+        <div class="side-body" id="sideBody"></div>
+      </aside>
+      <button class="side-toggle" id="sideOpen">&#9776; Panel</button>
+
+      <div class="map-layers" id="layerPanel">
+        <button class="lp-toggle" id="lpToggle" type="button">Layers <span>&#9662;</span></button>
+        <div class="lp-body">
+        <h4>Base map</h4>
+        <label><input type="radio" name="base" value="dark" checked> Night chart</label>
+        <label><input type="radio" name="base" value="ocean"> Ocean chart</label>
+        <hr><h4>Layers</h4>
+        <label><input type="checkbox" data-layer="ships" checked> <span class="sw" style="background:#7ba7b9"></span> Ships</label>
+        <label><input type="checkbox" data-layer="incidents" checked> <span class="sw" style="background:#e5807e"></span> Ships going dark</label>
+        <label><input type="checkbox" data-layer="regions"> <span class="sw" style="background:#9fbccb"></span> Possible areas</label>
+        <label><input type="checkbox" data-layer="circles"> <span class="sw" style="background:transparent;border:1.5px dashed #d5e2e8"></span> Reach circles</label>
+        <label><input type="checkbox" data-layer="ports" checked> <span class="sw" style="background:#d5e2e8"></span> Ports (3 km zones)</label>
+        <label><input type="checkbox" data-layer="wind"> <span class="sw" style="background:#c8d9e1"></span> Wind</label>
+        <label><input type="checkbox" data-layer="waves"> <span class="sw" style="background:#9fbccb"></span> Waves</label>
+        <label><input type="checkbox" data-layer="visited"> <span class="sw" style="background:#6f96ab"></span> Busy sea lanes</label>
+        <hr>
+        <label><input type="checkbox" id="optSyn" checked> <span class="sw" style="border:1.5px dashed #8ea6b4"></span> Show demo ships</label>
+      </div>
+      </div>
+
+      <div class="legend">
+        <span><i style="background:#7ba7b9"></i>moving</span><span><i style="background:#7f9fae"></i>stationary</span>
+        <span><i style="background:#eaf6f8"></i>in port</span><span><i style="background:#e5807e"></i>going dark</span>
+        <span><i style="border:1.5px dashed #8ea6b4;background:transparent"></i>demo ship</span>
+      </div>
+    </section>
+
+    <!-- ================= GOING DARK ================= -->
+    <section class="tab" id="tab-guide"><div class="page" id="guidePage"></div></section>
+    <section class="tab" id="tab-dark"><div class="page" id="darkPage"></div></section>
+    <!-- ================= PIPELINE ================= -->
+    <section class="tab" id="tab-pipe"><div class="page" id="pipePage"></div></section>
+    <!-- ================= TEMPORAL ================= -->
+    <section class="tab" id="tab-temporal"><div class="page" id="temporalPage"></div></section>
+    <!-- ================= PORTS ================= -->
+    <section class="tab" id="tab-ports"><div class="page" id="portsPage"></div></section>
+    <!-- ================= DBA ================= -->
+    <section class="tab" id="tab-dba"><div class="page" id="dbaPage"></div></section>
+    <!-- ================= ARCHITECTURE ================= -->
+    <section class="tab" id="tab-arch"><div class="page" id="archPage"></div></section>
+  </main>
+</div>
+
+
+<div id="guide"><div class="guide-box">
+  <div class="guide-head"><h2>Help: how to use every feature</h2><button id="guideClose" type="button" aria-label="Close">&times;</button></div>
+  <div class="guide-body">
+    <details open><summary>On every page</summary><ul>
+      <li>The <b>How it works</b> page walks you through the data step by step, shows where it comes from, checks it against the official source and explains every database table.</li>
+      <li>Boxes with an arrow open and close when you click their title.</li>
+      <li>Hover a number in the strip under the header to see what it means. The text at the top of each page says what the page is for.</li></ul></details>
+    <details><summary>Live Map</summary><ul>
+      <li><b>Click a ship</b> to see where it has been, its speed, its destination history and any times it went silent. <b>Replay</b> plays its journey; the slider moves through it.</li>
+      <li><b>Search box</b> (left): find a ship by name or ID.</li>
+      <li><b>Click a red ship or a row under “Ships going dark”</b> to see its last position, where it came back, the sea area it could have crossed, and a checklist explaining why it counts as going dark.</li>
+      <li><b>Layers</b> (top right): switch things on or off, such as wind, waves, ports and busy sea lanes. Click “Layers” to fold the box away.</li>
+      <li>Click empty water to clear your choice.</li></ul></details>
+    <details><summary>Going Dark</summary><ul>
+      <li>The slider sets how long a ship must be quiet before it counts as silent. The bars show how many silent ships have a normal reason and how many do not.</li>
+      <li>“Silent and unexplained” lists the rest. Click one to open it on the map. “History of silences” lists every case, with filters.</li></ul></details>
+    <details><summary>Pipeline</summary><ul>
+      <li>The picture shows data moving from the sources, through the check, into storage. The small cards show how each data source is doing. The last box lists refused records and why.</li></ul></details>
+    <details><summary>Temporal</summary><ul>
+      <li>Pick a ship. The top bars show when each destination was true. The diamonds underneath show when our system learned about it.</li>
+      <li>“Look back in time” shows what the destination was at a moment you choose.</li></ul></details>
+    <details><summary>Ports</summary><ul>
+      <li>Each card shows how many ships are in a port. The list shows arrivals and departures.</li></ul></details>
+    <details><summary>Database health and safety</summary><ul>
+      <li>The buttons at the top switch between Health, Permissions, Two at once, Speed and Backup.</li>
+      <li><b>Permissions:</b> “Test the permissions” tries things each user should and should not be able to do.</li>
+      <li><b>Two at once:</b> shows what happens when several people change the same ship together.</li>
+      <li><b>Speed:</b> do steps 1, 2, 3 and then 2 again to see how much an index speeds up a search.</li>
+      <li><b>Backup:</b> saves a copy of the database and proves it can be restored.</li></ul></details>
+    <details><summary>Demo controls</summary><ul>
+      <li><b>Load demo ships</b> adds made-up ships so you can see every situation. <b>Remove the demo ships</b> deletes them. The other buttons refresh live data or redo the checks.</li>
+      <li>Click the logo to go back to the opening page. Press Esc to close this help.</li></ul></details>
+  </div></div></div>
+
+<div id="busy"><div class="box"><div class="spinner"></div><div id="busyText">Working&hellip;</div></div></div>
+<div id="toasts"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="/static/app.js"></script>
+<script src="/static/panels.js"></script>
+<script src="/static/intro.js"></script>
+<script>DSW.boot(); INTRO.boot();</script>
+</body>
+</html>

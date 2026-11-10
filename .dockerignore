@@ -1,0 +1,9 @@
+.pgportable
+backups
+logs
+docs
+__pycache__
+data/natural_earth/extracted
+k8s
+*.bat
+scripts
