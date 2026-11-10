@@ -8,3 +8,6 @@ __pycache__/
 data/natural_earth/extracted/
 # duplicate of docs/Dark_Ship_Watch_Presentation_Final.pptx
 /Dark_Ship_Watch_Presentation_Final.pptx
+# presentations live outside git (big binaries slow every clone, incl. Jenkins)
+*.pptx
+~$*
