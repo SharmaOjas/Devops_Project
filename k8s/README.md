@@ -63,4 +63,13 @@ kubectl rollout undo deployment dark-ship-app
 compile check → `docker build` → throwaway kind cluster → `kubectl apply -f k8s/` → API smoke test →
 rolling update keeps 2 ready pods → data survives a `postgis-0` restart. On failure it prints the pod state and logs.
 
+## CD pipeline (Jenkins)
+
+[Jenkinsfile](../Jenkinsfile) deploys to the local Docker Desktop cluster (Jenkins runs as a Windows service on
+http://localhost:8081). Each build tags the image with the build number (`dark-ship-watch:<N>`), so every run is a
+real rolling update: build image → deploy database → re-run the setup Job (schema migration) and apply the app with
+the new tag → wait for rollout → smoke test `/api/health`. If any stage fails, it runs `kubectl rollout undo`.
+
+So: GitHub Actions = CI (tests every push on a throwaway cluster), Jenkins = CD (deploys to our cluster).
+
 Clean up: `kubectl delete -f k8s/` (the PVC stays; `kubectl delete pvc pgdata-postgis-0` removes the data).
